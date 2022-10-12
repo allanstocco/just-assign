@@ -3,4 +3,4 @@
 ## Session 1 
 ### Querying Database
 
-Please find Session 1 folder here(SESSION_1/)
+Please find Session 1 [folder](SESSION_1)
