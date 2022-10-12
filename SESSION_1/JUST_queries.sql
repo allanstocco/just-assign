@@ -7,12 +7,13 @@ FROM tbl_quote
 
 --------------------------------------------------------------------------------
 -- 2 Select name and full address of all accounts with more than 5 case created in 2011.
-SELECT DISTINCT tbl_account.AccountName, tbl_account.AddressLine1
+SELECT DISTINCT tbl_account.AccountName, tbl_account.AddressLine1, tbl_account.AddressLine2, tbl_account.AddressLine3
 FROM tbl_account 
 	INNER JOIN tbl_contact ON tbl_account.AccountID = tbl_contact.AccountID
 	INNER JOIN tbl_policy ON tbl_contact.ContactID = tbl_policy.ContactID
-		GROUP BY tbl_account.AccountName, tbl_account.AddressLine1
-			HAVING COUNT(*) > 5;
+		WHERE datepart(year, tbl_policy.DateCreated) = 2011 
+			GROUP BY tbl_account.AccountName, tbl_account.AddressLine1, tbl_account.AddressLine2, tbl_account.AddressLine3
+				HAVING COUNT(*) > 5;
 
 
 --------------------------------------------------------------------------------
@@ -25,9 +26,8 @@ FROM tbl_account
 		WHERE  datepart(year, tbl_quote.QuoteDate) = 2010
 			GROUP BY tbl_account.AccountName;
 
+
 --OR	WHERE tbl_quote.QuoteDate >= '2010-01-01' AND tbl_quote.QuoteDate < '2011-01-01' GROUP BY tbl_account.AccountName;
-
-
 --------------------------------------------------------------------------------
 
 -- 4 Select account name, contact last name, case number, quote number, quote date and quote value for the third largest quote ever created for each of the accounts in the EC1 area
@@ -55,7 +55,7 @@ SELECT
 		INNER JOIN tbl_policy ON tbl_policy.PolicyID = QUOTE.PolicyID
 		INNER JOIN tbl_contact ON tbl_contact.ContactID = tbl_policy.ContactID
 		INNER JOIN tbl_account ON tbl_account.AccountID = tbl_contact.AccountID
-		WHERE QUOTE.RANKING = 3 AND tbl_account.AddressLine1 LIKE '%EC1%'
+			WHERE QUOTE.RANKING = 3 AND tbl_account.AddressLine1 LIKE '%EC1%'
 
 
 		
@@ -77,4 +77,17 @@ FROM tbl_account
 		GROUP BY tbl_account.AccountName, tbl_contact.Lastname, tbl_policy.PolicyNumber, tbl_policy.PolicyID
 			WHERE tbl_account.AddressLine1 LIKE '%EC1%'
 				ORDER BY tbl_account.AccountName
+
+
 --------------------------------------------------------------------------------
+
+-- 5 Select first name and last name for each contact working in accounts in the EC1 area and the date of the most recent and the oldest quote
+SELECT tbl_contact.Firstname, tbl_contact.Lastname, tbl_account.AddressLine1, RECENT_QUOTE, OLDEST_QUOTE
+	FROM tbl_account
+		INNER JOIN tbl_contact ON tbl_contact.AccountID = tbl_account.AccountID
+		INNER JOIN tbl_policy ON tbl_policy.ContactID = tbl_policy.ContactID
+		INNER JOIN (SELECT tbl_quote.PolicyID, MAX(tbl_quote.QuoteDate) AS RECENT_QUOTE, MIN(tbl_quote.QuoteDate) AS OLDEST_QUOTE
+			FROM tbl_quote
+				GROUP BY tbl_quote.PolicyID) QUERI ON QUERI.PolicyID = tbl_policy.PolicyID
+					AND tbl_policy.ContactID = tbl_contact.ContactID
+						WHERE tbl_account.AddressLine1 LIKE '%EC1%'

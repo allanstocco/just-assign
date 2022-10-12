@@ -9,7 +9,7 @@
 
 ## Session 2
 ### Database Modeling
-
+![](SESSION_2/vault_modeling.png)
 
 ## Session 3
 ### Python Code Challenges
