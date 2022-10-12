@@ -1,17 +1,75 @@
--- Select policy number, quote value and quote date for all quotes created between the 1st of October of 2009 and the 3rd of May 2010.
-
+-- 1 Select policy number, quote value and quote date for all quotes created between the 1st of October of 2009 and the 3rd of May 2010.
 SELECT tbl_policy.PolicyNumber, tbl_quote.QuoteValue, tbl_quote.QuoteDate 
 FROM tbl_quote 
 	INNER JOIN tbl_policy ON tbl_quote.PolicyID = tbl_policy.PolicyID 
 		WHERE tbl_quote.DateCreated BETWEEN '2009-10-01' AND '2010-05-03';
 
--- Select name and full address of all accounts with more than 5 case created in 2011.
 
+--------------------------------------------------------------------------------
+-- 2 Select name and full address of all accounts with more than 5 case created in 2011.
 SELECT DISTINCT tbl_account.AccountName, tbl_account.AddressLine1
 FROM tbl_account 
 	INNER JOIN tbl_contact ON tbl_account.AccountID = tbl_contact.AccountID
 	INNER JOIN tbl_policy ON tbl_contact.ContactID = tbl_policy.ContactID
 		GROUP BY tbl_account.AccountName, tbl_account.AddressLine1
 			HAVING COUNT(*) > 5;
+
+
+--------------------------------------------------------------------------------
+-- 3 Select Account Name and average quote value per year.
+SELECT DISTINCT tbl_account.AccountName, AVG(tbl_quote.QuoteValue)
+FROM tbl_account
+	INNER JOIN tbl_contact ON tbl_account.AccountID = tbl_contact.AccountID
+	INNER JOIN tbl_policy ON tbl_contact.ContactID = tbl_policy.ContactID
+	INNER JOIN tbl_quote ON tbl_policy.PolicyID = tbl_quote.PolicyID
+		WHERE  datepart(year, tbl_quote.QuoteDate) = 2010
+			GROUP BY tbl_account.AccountName;
+
+--OR	WHERE tbl_quote.QuoteDate >= '2010-01-01' AND tbl_quote.QuoteDate < '2011-01-01' GROUP BY tbl_account.AccountName;
+
+
+--------------------------------------------------------------------------------
+
+-- 4 Select account name, contact last name, case number, quote number, quote date and quote value for the third largest quote ever created for each of the accounts in the EC1 area
+
+-- This one was quite tricky so I tried to approach a solution in many ways. These two following was the most approx I reached
+
+-- SOLUTION 1
+SELECT
+	QUOTE.PolicyID,
+	QUOTE.QuoteNumber, 
+	QUOTE.QuoteDate, 
+	QUOTE.QuoteValue,
+	tbl_account.AccountName,
+	tbl_contact.Lastname
+	FROM
+		(SELECT		
+			tbl_quote.PolicyID, 
+			tbl_quote.QuoteNumber, 
+			tbl_quote.QuoteDate, 
+			tbl_quote.QuoteValue, 
+			RANK() OVER (PARTITION BY tbl_quote.PolicyID 
+				ORDER BY tbl_quote.QuoteValue DESC) 
+					AS RANKING
+			FROM tbl_quote) QUOTE
+		INNER JOIN tbl_policy ON tbl_policy.PolicyID = QUOTE.PolicyID
+		INNER JOIN tbl_contact ON tbl_contact.ContactID = tbl_policy.ContactID
+		INNER JOIN tbl_account ON tbl_account.AccountID = tbl_contact.AccountID
+		WHERE QUOTE.RANKING = 3 AND tbl_account.AddressLine1 LIKE '%ARNOLD%'
+
+
 		
--- Select Account Name and average quote value per year.
+-- SOLUTION 2
+SELECT tbl_account.AccountName, tbl_contact.Lastname, tbl_policy.PolicyNumber, tbl_policy.PolicyID, (SELECT tbl_quote.QuoteValue
+					FROM tbl_quote
+					WHERE PolicyID = tbl_policy.PolicyID
+						ORDER BY tbl_quote.QuoteValue DESC
+						OFFSET 2 ROWS
+						FETCH NEXT 1 ROWS ONLY) AS THIRD_HIGHEST
+FROM tbl_account
+	INNER JOIN tbl_contact ON tbl_account.AccountID = tbl_contact.AccountID
+	INNER JOIN tbl_policy ON tbl_contact.ContactID = tbl_policy.ContactID
+	INNER JOIN tbl_quote ON tbl_policy.PolicyID = tbl_quote.PolicyID
+GROUP BY tbl_account.AccountName, tbl_contact.Lastname, tbl_policy.PolicyNumber, tbl_policy.PolicyID
+ORDER BY tbl_account.AccountName
+--------------------------------------------------------------------------------
