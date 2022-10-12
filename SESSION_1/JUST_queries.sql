@@ -55,21 +55,26 @@ SELECT
 		INNER JOIN tbl_policy ON tbl_policy.PolicyID = QUOTE.PolicyID
 		INNER JOIN tbl_contact ON tbl_contact.ContactID = tbl_policy.ContactID
 		INNER JOIN tbl_account ON tbl_account.AccountID = tbl_contact.AccountID
-		WHERE QUOTE.RANKING = 3 AND tbl_account.AddressLine1 LIKE '%ARNOLD%'
+		WHERE QUOTE.RANKING = 3 AND tbl_account.AddressLine1 LIKE '%EC1%'
 
 
 		
 -- SOLUTION 2
-SELECT tbl_account.AccountName, tbl_contact.Lastname, tbl_policy.PolicyNumber, tbl_policy.PolicyID, (SELECT tbl_quote.QuoteValue
-					FROM tbl_quote
-					WHERE PolicyID = tbl_policy.PolicyID
-						ORDER BY tbl_quote.QuoteValue DESC
-						OFFSET 2 ROWS
-						FETCH NEXT 1 ROWS ONLY) AS THIRD_HIGHEST
+SELECT 
+	tbl_account.AccountName, 
+	tbl_contact.Lastname, 
+	tbl_policy.PolicyNumber, 
+	tbl_policy.PolicyID, 
+	(SELECT tbl_quote.QuoteValue FROM tbl_quote
+		WHERE PolicyID = tbl_policy.PolicyID
+			ORDER BY tbl_quote.QuoteValue DESC
+				OFFSET 2 ROWS
+					FETCH NEXT 1 ROWS ONLY) AS THIRD_HIGHEST
 FROM tbl_account
 	INNER JOIN tbl_contact ON tbl_account.AccountID = tbl_contact.AccountID
 	INNER JOIN tbl_policy ON tbl_contact.ContactID = tbl_policy.ContactID
 	INNER JOIN tbl_quote ON tbl_policy.PolicyID = tbl_quote.PolicyID
-GROUP BY tbl_account.AccountName, tbl_contact.Lastname, tbl_policy.PolicyNumber, tbl_policy.PolicyID
-ORDER BY tbl_account.AccountName
+		GROUP BY tbl_account.AccountName, tbl_contact.Lastname, tbl_policy.PolicyNumber, tbl_policy.PolicyID
+			WHERE tbl_account.AddressLine1 LIKE '%EC1%'
+				ORDER BY tbl_account.AccountName
 --------------------------------------------------------------------------------
