@@ -1,0 +1,105 @@
+{\rtf1\ansi\ansicpg1252\deff0\nouicompat\deflang2057{\fonttbl{\f0\fnil\fcharset0 Consolas;}{\f1\fnil Consolas;}}
+{\colortbl ;\red0\green128\blue0;\red0\green0\blue0;\red0\green0\blue255;\red128\green128\blue128;\red255\green0\blue0;\red255\green0\blue255;}
+{\*\generator Riched20 10.0.22621}\viewkind4\uc1 
+\pard\sa200\sl276\slmult1\cf1\f0\fs19\lang1046 1 \f1\lang22 -- Select policy number, quote value and quote date for all quotes created between the 1st of October of 2009 and the 3rd of May 2010.\cf2\par
+\cf3 SELECT\cf2  tbl_policy\cf4 .\cf2 PolicyNumber\cf4 ,\cf2  tbl_quote\cf4 .\cf2 QuoteValue\cf4 ,\cf2  tbl_quote\cf4 .\cf2 QuoteDate \par
+\cf3 FROM\cf2  tbl_quote \par
+\tab\cf4 INNER\cf2  \cf4 JOIN\cf2  tbl_policy \cf3 ON\cf2  tbl_quote\cf4 .\cf2 PolicyID \cf4 =\cf2  tbl_policy\cf4 .\cf2 PolicyID \par
+\tab\tab\cf3 WHERE\cf2  tbl_quote\cf4 .\cf2 DateCreated \cf4 BETWEEN\cf2  \cf5 '2009-10-01'\cf2  \cf4 AND\cf2  \cf5 '2010-05-03'\cf4 ;\cf2\par
+\par
+\f0\lang1046 --------------------------------------------------------------------------------\f1\lang22\par
+\cf1\f0\lang1046 2 \f1\lang22 -- Select name and full address of all accounts with more than 5 case created in 2011.\cf2\par
+\cf3 SELECT\cf2  \cf3 DISTINCT\cf2  tbl_account\cf4 .\cf2 AccountName\cf4 ,\cf2  tbl_account\cf4 .\cf2 AddressLine1\par
+\cf3 FROM\cf2  tbl_account \par
+\tab\cf4 INNER\cf2  \cf4 JOIN\cf2  tbl_contact \cf3 ON\cf2  tbl_account\cf4 .\cf2 AccountID \cf4 =\cf2  tbl_contact\cf4 .\cf2 AccountID\par
+\tab\cf4 INNER\cf2  \cf4 JOIN\cf2  tbl_policy \cf3 ON\cf2  tbl_contact\cf4 .\cf2 ContactID \cf4 =\cf2  tbl_policy\cf4 .\cf2 ContactID\par
+\tab\tab\cf3 GROUP\cf2  \cf3 BY\cf2  tbl_account\cf4 .\cf2 AccountName\cf4 ,\cf2  tbl_account\cf4 .\cf2 AddressLine1\par
+\tab\tab\tab\cf3 HAVING\cf2  \cf6 COUNT\cf4 (*)\cf2  \cf4 >\cf2  5\cf4 ;\par
+\par
+\f0\lang1046 --------------------------------------------------------------------------------\f1\lang22\par
+\cf1\f0\lang1046 3 \f1\lang22 -- Select Account Name and average quote value per year.\cf2\par
+\cf3 SELECT\cf2  \cf3 DISTINCT\cf2  tbl_account\cf4 .\cf2 AccountName\cf4 ,\cf2  \cf6 AVG\cf4 (\cf2 tbl_quote\cf4 .\cf2 QuoteValue\cf4 )\cf2\par
+\cf3 FROM\cf2  tbl_account\par
+\tab\cf4 INNER\cf2  \cf4 JOIN\cf2  tbl_contact \cf3 ON\cf2  tbl_account\cf4 .\cf2 AccountID \cf4 =\cf2  tbl_contact\cf4 .\cf2 AccountID\par
+\tab\cf4 INNER\cf2  \cf4 JOIN\cf2  tbl_policy \cf3 ON\cf2  tbl_contact\cf4 .\cf2 ContactID \cf4 =\cf2  tbl_policy\cf4 .\cf2 ContactID\par
+\tab\cf4 INNER\cf2  \cf4 JOIN\cf2  tbl_quote \cf3 ON\cf2  tbl_policy\cf4 .\cf2 PolicyID \cf4 =\cf2  tbl_quote\cf4 .\cf2 PolicyID\par
+\tab\tab\cf3 WHERE\cf2   \cf6 datepart\cf4 (\cf6 year\cf4 ,\cf2  tbl_quote\cf4 .\cf2 QuoteDate\cf4 )\cf2  \cf4 =\cf2  2010\par
+\tab\tab\tab\cf3 GROUP\cf2  \cf3 BY\cf2  tbl_account\cf4 .\cf2 AccountName\cf4 ;\cf2\par
+\par
+\cf1 --OR\tab WHERE tbl_quote.QuoteDate >= '2010-01-01' AND tbl_quote.QuoteDate < '2011-01-01' GROUP BY tbl_account.AccountName;\par
+\par
+\f0\lang1046 --------------------------------------------------------------------------------\par
+\par
+\f1 -- Select account name, contact last name, case number, quote number, quote date and quote value for the third largest quote ever created for each of the accounts in the EC1 area\cf2\par
+\par
+\cf3 SELECT\cf2  tbl_account\cf4 .\cf2 AccountName\cf4 ,\cf2  tbl_contact\cf4 .\cf2 Lastname\cf4 ,\cf2  tbl_policy\cf4 .\cf2 PolicyNumber\cf4 ,\cf2  tbl_quote\cf4 .\cf2 QuoteNumber\cf4 ,\cf2  tbl_quote\cf4 .\cf2 QuoteDate\cf4 ,\cf2  tbl_quote\cf4 .\cf2 QuoteValue \par
+\cf3 FROM\cf2  tbl_account\par
+\tab\cf4 INNER\cf2  \cf4 JOIN\cf2  tbl_contact \cf3 ON\cf2  tbl_account\cf4 .\cf2 AccountID \cf4 =\cf2  tbl_contact\cf4 .\cf2 AccountID\par
+\tab\cf4 INNER\cf2  \cf4 JOIN\cf2  tbl_policy \cf3 ON\cf2  tbl_contact\cf4 .\cf2 ContactID \cf4 =\cf2  tbl_policy\cf4 .\cf2 ContactID\par
+\tab\cf4 INNER\cf2  \cf4 JOIN\cf2  tbl_quote \cf3 ON\cf2  tbl_policy\cf4 .\cf2 PolicyID \cf4 =\cf2  tbl_quote\cf4 .\cf2 PolicyID\par
+\tab\tab\cf3 WHERE\cf2  tbl_account\cf4 .\cf2 AddressLine1 \cf4 LIKE\cf2  \cf5 '%ARNOLD%'\cf2   \par
+\tab\tab\tab\cf4 AND\cf2  tbl_quote\cf4 .\cf2 QuoteValue \cf4 IN\cf2  \par
+\cf3\tab\tab\tab\tab\cf4 (\cf3 SELECT\cf2  \cf3 TOP\cf4 (\cf2 3\cf4 )\cf2 tbl_quote\cf4 .\cf2 QuoteValue \par
+\tab\tab\tab\tab\tab\cf3 FROM\cf2  tbl_quote\par
+\tab\tab\tab\tab\tab\tab\cf3 ORDER\cf2  \cf3 BY\cf2  tbl_account\cf4 .\cf2 AccountName\cf4 ,\cf2  \f0\tab\tab\tab\tab\tab\tab\tab\tab\f1 tbl_quote\cf4 .\cf2 QuoteValue \cf3 DESC\cf4 )\par
+\par
+\cf1 -- \f0 SOLUTION 1\cf4\f1\par
+\cf3 SELECT\cf2\par
+\tab QUOTE\cf4 .\cf2 PolicyID\cf4 ,\cf2\par
+\tab QUOTE\cf4 .\cf2 QuoteNumber\cf4 ,\cf2  \par
+\tab QUOTE\cf4 .\cf2 QuoteDate\cf4 ,\cf2  \par
+\tab QUOTE\cf4 .\cf2 QuoteValue\cf4 ,\cf2\par
+\tab tbl_account\cf4 .\cf2 AccountName\cf4 ,\cf2\par
+\tab tbl_contact\cf4 .\cf2 Lastname\par
+\tab\cf3 FROM\cf2\par
+\cf3\tab\tab\cf4 (\cf3 SELECT\cf2\tab\tab\par
+\tab\tab\tab tbl_quote\cf4 .\cf2 PolicyID\cf4 ,\cf2  \par
+\tab\tab\tab tbl_quote\cf4 .\cf2 QuoteNumber\cf4 ,\cf2  \par
+\tab\tab\tab tbl_quote\cf4 .\cf2 QuoteDate\cf4 ,\cf2  \par
+\tab\tab\tab tbl_quote\cf4 .\cf2 QuoteValue\cf4 ,\cf2  \par
+\tab\tab\tab\cf6 RANK\cf4 ()\cf2  \cf3 OVER \cf4 (\cf3 PARTITION\cf2  \cf3 BY\cf2  tbl_quote\cf4 .\cf2 PolicyID \par
+\tab\tab\tab\tab\cf3 ORDER\cf2  \cf3 BY\cf2  tbl_quote\cf4 .\cf2 QuoteValue \cf3 DESC\cf4 )\cf2  \par
+\tab\tab\tab\tab\tab\cf3 AS\cf2  RANKING\par
+\tab\tab\tab\cf3 FROM\cf2  tbl_quote\cf4 )\cf2  QUOTE\par
+\tab\tab\cf4 INNER\cf2  \cf4 JOIN\cf2  tbl_policy \cf3 ON\cf2  tbl_policy\cf4 .\cf2 PolicyID \cf4 =\cf2  QUOTE\cf4 .\cf2 PolicyID\par
+\tab\tab\cf4 INNER\cf2  \cf4 JOIN\cf2  tbl_contact \cf3 ON\cf2  tbl_contact\cf4 .\cf2 ContactID \cf4 =\cf2  tbl_policy\cf4 .\cf2 ContactID\par
+\tab\tab\cf4 INNER\cf2  \cf4 JOIN\cf2  tbl_account \cf3 ON\cf2  tbl_account\cf4 .\cf2 AccountID \cf4 =\cf2  tbl_contact\cf4 .\cf2 AccountID\par
+\tab\tab\cf3 WHERE\cf2  QUOTE\cf4 .\cf2 RANKING \cf4 =\cf2  3 \cf4 AND\cf2  tbl_account\cf4 .\cf2 AddressLine1 \cf4 LIKE\cf2  \cf5 '%ARNOLD%'\cf4\par
+\cf1 -- \f0 SOLUTION 2\par
+\cf3\f1 SELECT\cf2  tbl_account\cf4 .\cf2 AccountName\cf4 ,\cf2  tbl_contact\cf4 .\cf2 Lastname\cf4 ,\cf2  tbl_policy\cf4 .\cf2 PolicyNumber\cf4 ,\cf2  tbl_policy\cf4 .\cf2 PolicyID\cf4 ,\cf3  \cf4 (\cf3 SELECT\cf2  tbl_quote\cf4 .\cf2 QuoteValue\par
+\tab\tab\tab\tab\tab\cf3 FROM\cf2  tbl_quote\par
+\tab\tab\tab\tab\tab\cf3 WHERE\cf2  PolicyID \cf4 =\cf2  tbl_policy\cf4 .\cf2 PolicyID\par
+\tab\tab\tab\tab\tab\tab\cf3 ORDER\cf2  \cf3 BY\cf2  tbl_quote\cf4 .\cf2 QuoteValue \cf3 DESC\cf2\par
+\tab\tab\tab\tab\tab\tab OFFSET 2 \cf3 ROWS\cf2\par
+\tab\tab\tab\tab\tab\tab\cf3 FETCH\cf2  \cf3 NEXT\cf2  1 \cf3 ROWS\cf2  ONLY\cf4 )\cf2  \cf3 AS\cf2\f0  \f1 THIRD_HIGHEST\par
+\cf3 FROM\cf2  tbl_account\par
+\tab\cf4 INNER\cf2  \cf4 JOIN\cf2  tbl_contact \cf3 ON\cf2  tbl_account\cf4 .\cf2 AccountID \cf4 =\cf2  tbl_contact\cf4 .\cf2 AccountID\par
+\tab\cf4 INNER\cf2  \cf4 JOIN\cf2  tbl_policy \cf3 ON\cf2  tbl_contact\cf4 .\cf2 ContactID \cf4 =\cf2  tbl_policy\cf4 .\cf2 ContactID\par
+\tab\cf4 INNER\cf2  \cf4 JOIN\cf2  tbl_quote \cf3 ON\cf2  tbl_policy\cf4 .\cf2 PolicyID \cf4 =\cf2  tbl_quote\cf4 .\cf2 PolicyID\par
+\cf3 GROUP\cf2  \cf3 BY\cf2  tbl_account\cf4 .\cf2 AccountName\cf4 ,\cf2  tbl_contact\cf4 .\cf2 Lastname\cf4 ,\cf2  tbl_policy\cf4 .\cf2 PolicyNumber\cf4 ,\cf2  tbl_policy\cf4 .\cf2 PolicyID\par
+\cf3 ORDER\cf2  \cf3 BY\cf2  tbl_account\cf4 .\cf2 AccountName\cf4\par
+\f0 --------------------------------------------------------------------------------\par
+\tab\cf1\f1 -- Select first name and last name for each contact working in accounts in the EC1 area and the date of the most recent and the oldest quote\cf2\par
+\par
+\cf3 SELECT\cf2  \cf3 DISTINCT\cf2  tbl_contact\cf4 .\cf2 Firstname\cf4 ,\cf2  tbl_contact\cf4 .\cf2 Lastname\cf4 ,\cf2  tbl_quote\cf4 .\cf2 QuoteDate \par
+\cf3 FROM\cf2  tbl_account\par
+\tab\cf4 INNER\cf2  \cf4 JOIN\cf2  tbl_contact \cf3 ON\cf2  tbl_contact\cf4 .\cf2 AccountID \cf4 =\cf2  tbl_account\cf4 .\cf2 AccountID\par
+\tab\cf4 INNER\cf2  \cf4 JOIN\cf2  tbl_policy \cf3 ON\cf2  tbl_policy\cf4 .\cf2 ContactID \cf4 =\cf2  tbl_contact\cf4 .\cf2 ContactID\par
+\tab\cf4 INNER\cf2  \cf4 JOIN\cf2  tbl_quote \cf3 ON\cf2  tbl_quote\cf4 .\cf2 PolicyID \cf4 =\cf2  tbl_quote\cf4 .\cf2 PolicyID\par
+\tab\tab\cf3 WHERE\cf2  tbl_account\cf4 .\cf2 AddressLine1 \cf4 LIKE\cf2  \cf5 '%ARNOLD%'\cf4\f0\par
+\par
+\par
+\par
+\par
+\par
+\par
+\par
+\par
+\par
+\par
+\par
+\par
+\par
+\cf3\f1\par
+}
+ 
