@@ -9,8 +9,14 @@
 
 ## Session 2
 ### Database Modeling
+Q1 - 
+
 ![](SESSION_2/vault_modeling.png)
 
+
+Q2 - 
+
+![](SESSION_2/kimball_grain_dimension.png)
 ## Session 3
 ### Python Code Challenges
 

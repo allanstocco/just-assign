@@ -18,6 +18,8 @@ FROM tbl_account
 
 --------------------------------------------------------------------------------
 -- 3 Select Account Name and average quote value per year.
+
+-- SOLUTION 1
 SELECT DISTINCT tbl_account.AccountName, AVG(tbl_quote.QuoteValue)
 FROM tbl_account
 	INNER JOIN tbl_contact ON tbl_account.AccountID = tbl_contact.AccountID
@@ -28,6 +30,15 @@ FROM tbl_account
 
 
 --OR	WHERE tbl_quote.QuoteDate >= '2010-01-01' AND tbl_quote.QuoteDate < '2011-01-01' GROUP BY tbl_account.AccountName;
+
+-- OR
+-- SOLUTION 2 
+SELECT tbl_account.AccountName, YEAR(tbl_quote.QuoteDate) AS QUOTES_YEAR, AVG(tbl_quote.QuoteValue) AS AVG_QUOTE_VALUE
+FROM tbl_account
+	INNER JOIN tbl_contact ON tbl_account.AccountID = tbl_contact.AccountID
+	INNER JOIN tbl_policy ON tbl_contact.ContactID = tbl_policy.ContactID
+	INNER JOIN tbl_quote ON tbl_policy.PolicyID = tbl_quote.PolicyID
+		GROUP BY tbl_account.AccountName, YEAR(tbl_quote.QuoteDate);
 --------------------------------------------------------------------------------
 
 -- 4 Select account name, contact last name, case number, quote number, quote date and quote value for the third largest quote ever created for each of the accounts in the EC1 area
@@ -63,8 +74,8 @@ SELECT
 SELECT 
 	tbl_account.AccountName, 
 	tbl_contact.Lastname, 
-	tbl_policy.PolicyNumber, 
 	tbl_policy.PolicyID, 
+	tbl_policy.PolicyNumber,
 	(SELECT tbl_quote.QuoteValue FROM tbl_quote
 		WHERE PolicyID = tbl_policy.PolicyID
 			ORDER BY tbl_quote.QuoteValue DESC
@@ -74,9 +85,9 @@ FROM tbl_account
 	INNER JOIN tbl_contact ON tbl_account.AccountID = tbl_contact.AccountID
 	INNER JOIN tbl_policy ON tbl_contact.ContactID = tbl_policy.ContactID
 	INNER JOIN tbl_quote ON tbl_policy.PolicyID = tbl_quote.PolicyID
-		GROUP BY tbl_account.AccountName, tbl_contact.Lastname, tbl_policy.PolicyNumber, tbl_policy.PolicyID
-			WHERE tbl_account.AddressLine1 LIKE '%EC1%'
-				ORDER BY tbl_account.AccountName
+		WHERE tbl_account.AddressLine1 LIKE '%EC1%'
+			GROUP BY tbl_account.AccountName, tbl_contact.Lastname, tbl_policy.PolicyNumber, tbl_policy.PolicyID
+				ORDER BY tbl_account.AccountName DESC
 
 
 --------------------------------------------------------------------------------
